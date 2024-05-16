@@ -1,72 +1,59 @@
-const itemCount = document.getElementById('item-count');
-const uncheckedCount = document.getElementById('unchecked-count');
-const newTodoBtn = document.querySelector('.btn-primary');
-const todoList = document.getElementById('todo-list');
-
-let totalCountValue = 3;
-let uncheckedCountValue = 1;
-
-function updateCounts() {
-    itemCount.textContent = totalCountValue;
-    uncheckedCount.textContent = uncheckedCountValue;
-}
-
-function createTodoItem(text) {
-    const listItem = document.createElement('li');
-    listItem.classList.add('list-group-item');
-
-    const checkbox = document.createElement('input');
-    checkbox.setAttribute('type', 'checkbox');
-    checkbox.classList.add('form-check-input', 'me-2');
-
-    const label = document.createElement('label');
-    label.textContent = text;
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'float-end');
-    deleteBtn.textContent = 'delete';
-
-    listItem.appendChild(checkbox);
-    listItem.appendChild(label);
-    listItem.appendChild(deleteBtn);
-
-    return listItem;
-}
-
-newTodoBtn.addEventListener('click', function() {
-    // Prompt for new todo text
-    const newTodoText = prompt('Введіть нове завдання:');
-    if (newTodoText) {
-        const newTodoItem = createTodoItem(newTodoText);
-        
-        todoList.appendChild(newTodoItem);
-        totalCountValue++;
-        uncheckedCountValue++;
-        updateCounts();
+let todos = [
+    { id: 1, title: 'Вивчити HTML', completed: true },
+    { id: 2, title: 'Вивчити CSS', completed: true },
+    { id: 3, title: 'Вивчити JavaScript', completed: false }
+  ];
+  
+  function newTodo() {
+    const title = prompt("Введіть нову справу:");
+    if (title) {
+      const newTodo = {
+        id: todos.length + 1,
+        title: title,
+        completed: false
+      };
+      todos.push(newTodo);
+      render();
+      updateCounter();
     }
-});
-
-todoList.addEventListener('click', function(event) {
-    if (event.target.classList.contains('btn-danger')) {
-        event.target.parentElement.remove();
-
-        totalCountValue--;
-        if (!event.target.previousSibling.checked) {
-            uncheckedCountValue--;
-        }
-        updateCounts();
-    }
-});
-
-todoList.addEventListener('change', function(event) {
-    if (event.target.type === 'checkbox') {
-        if (event.target.checked) {
-            uncheckedCountValue--;
-        } else {
-            uncheckedCountValue++;
-        }
-        updateCounts();
-    }
-});
-
-updateCounts();
+  }
+  
+  function renderTodo(todo) {
+    return `
+      <li class="list-group-item">
+        <input type="checkbox" class="form-check-input me-2" id="${todo.id}" ${todo.completed ? 'checked' : ''} onchange="checkTodo(${todo.id})">
+        <label for="${todo.id}" class="${todo.completed ? 'text-success text-decoration-line-through' : ''}">${todo.title}</label>
+        <button class="btn btn-danger btn-sm float-end" onclick="deleteTodo(${todo.id})">delete</button>
+      </li>
+    `;
+  }
+  
+  function render() {
+    const todoList = document.getElementById('todo-list');
+    const todoHTML = todos.map(todo => renderTodo(todo)).join('');
+    todoList.innerHTML = todoHTML;
+  }
+  
+  function updateCounter() {
+    const itemCount = todos.length;
+    const uncheckedCount = todos.filter(todo => !todo.completed).length;
+    document.getElementById('item-count').innerText = itemCount;
+    document.getElementById('unchecked-count').innerText = uncheckedCount;
+  }
+  
+  function deleteTodo(todoId) {
+    todos = todos.filter(todo => todo.id !== todoId);
+    render();
+    updateCounter();
+  }
+  
+  function checkTodo(todoId) {
+    const todo = todos.find(todo => todo.id === todoId);
+    todo.completed = !todo.completed;
+    render();
+    updateCounter();
+  }
+  
+  render();
+  updateCounter();
+  
