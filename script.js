@@ -69,5 +69,4 @@ todoList.addEventListener('change', function(event) {
     }
 });
 
-// Initial update of counts
 updateCounts();
